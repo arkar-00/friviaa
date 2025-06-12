@@ -18,13 +18,30 @@ class GamePage extends StatelessWidget {
   }
 
   Widget _buildUI() {
-    return Scaffold(
-      body: SafeArea(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: _deviceHeight! * 0.05),
-          child: _gameUI(),
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        _pageProvider = context.watch<GamePageProvider>();
+        if (_pageProvider!.questions != null) {
+          return Scaffold(
+            body: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromRGBO(26, 40, 108, 1.0),
+                    Color.fromRGBO(0, 0, 0, 1.0),
+                  ],
+                ),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: _deviceHeight! * 0.05),
+              child: _gameUI(),
+            ),
+          );
+        } else {
+          return Center(child: CircularProgressIndicator(color: Colors.white));
+        }
+      },
     );
   }
 
@@ -48,7 +65,7 @@ class GamePage extends StatelessWidget {
 
   Widget _questionText() {
     return Text(
-      "Text Question 1, Nothing Intersting",
+      _pageProvider!.getCurrentQuestionText(),
       style: TextStyle(
         color: Colors.white,
         fontSize: 25,
@@ -60,7 +77,7 @@ class GamePage extends StatelessWidget {
   Widget _trueButton() {
     return MaterialButton(
       onPressed: () {},
-      color: Colors.green,
+      color: const Color(0xFF26a69a),
       minWidth: _deviceWidth! * 0.80,
       height: _deviceHeight! * 0.10,
       child: const Text(
@@ -73,7 +90,7 @@ class GamePage extends StatelessWidget {
   Widget _falseButton() {
     return MaterialButton(
       onPressed: () {},
-      color: Colors.red,
+      color: const Color(0xFFef5350),
       minWidth: _deviceWidth! * 0.80,
       height: _deviceHeight! * 0.10,
       child: const Text(

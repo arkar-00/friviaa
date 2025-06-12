@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Frivia',
       theme: ThemeData(
         fontFamily: 'ArchitectsDaughter',
-        scaffoldBackgroundColor: Color.fromRGBO(31, 31, 31, 1.0),
+        // scaffoldBackgroundColor: Color.fromRGBO(31, 31, 31, 1.0),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: GamePage(),
