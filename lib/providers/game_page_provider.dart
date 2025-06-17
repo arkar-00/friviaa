@@ -5,11 +5,13 @@ import 'package:dio/dio.dart';
 class GamePageProvider extends ChangeNotifier {
   final Dio _dio = Dio();
   final int _maxQuestions = 10;
+  final String difficultyLevel;
   List? questions;
   int _currentQuestionCount = 0;
+  int _correctQuestionCount = 0;
 
   BuildContext context;
-  GamePageProvider({required this.context}) {
+  GamePageProvider({required this.context, required this.difficultyLevel}) {
     _dio.options.baseUrl = 'https://opentdb.com/api.php';
     _getQuestionFromAPI();
   }
@@ -21,7 +23,7 @@ class GamePageProvider extends ChangeNotifier {
         queryParameters: {
           "amount": _maxQuestions,
           "type": 'boolean',
-          'difficulty': 'easy',
+          'difficulty': difficultyLevel,
         },
       );
       questions = response.data['results'] as List?;
@@ -44,8 +46,12 @@ class GamePageProvider extends ChangeNotifier {
   void answerQuestion(String answer) async {
     if (questions == null || _currentQuestionCount >= questions!.length) return;
 
-    final correctAnswer = questions![_currentQuestionCount]['correct_answer'];
+    final correctAnswer =
+        questions?.elementAt(_currentQuestionCount)['correct_answer'];
     final isCorrect = correctAnswer == answer;
+    if (isCorrect) {
+      _correctQuestionCount++;
+    }
 
     _currentQuestionCount++;
     showDialog(
@@ -69,6 +75,33 @@ class GamePageProvider extends ChangeNotifier {
     );
     await Future.delayed(const Duration(seconds: 1));
     Navigator.pop(context);
-    notifyListeners();
+    if (_currentQuestionCount == _maxQuestions) {
+      endGame();
+    } else {
+      notifyListeners();
+    }
+  }
+
+  Future<void> endGame() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext _context) {
+        return AlertDialog(
+          backgroundColor: Colors.blue,
+          title: Text(
+            "End Game!",
+            style: TextStyle(fontSize: 25, color: Colors.white),
+          ),
+          content: Text(
+            "Score: $_correctQuestionCount/$_maxQuestions",
+            style: TextStyle(fontSize: 25, color: Colors.white),
+          ),
+        );
+      },
+    );
+    await Future.delayed(Duration(seconds: 3));
+    Navigator.pop(context);
+    Navigator.pop(context);
+    _currentQuestionCount = 0;
   }
 }
